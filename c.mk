@@ -20,6 +20,12 @@
 #   include c.mk
 #
 
+ifeq ($V, 1)
+	Q =
+else
+	Q = @
+endif
+
 OBJS = $(patsubst %.c,%.o,$(SRC))
 
 #  Determine C flags and ld flags
@@ -31,8 +37,8 @@ else
 	PKG_LDFLAGS =
 endif
 
-CFLAGS ?= -Wall -Werror -std=c99 -O2
-CFLAGS += $(PKG_CFLAGS)
+CFLAGS ?= -Wall -Werror -O2
+CFLAGS += $(PKG_CFLAGS) -std=c99
 LDFLAGS += $(PKG_LDFLAGS)
 
 # GNU-compliant install directories
@@ -47,14 +53,14 @@ all: $(BIN)
 
 %.o: %.c
 	@echo " CC $@"
-	$(CC) -c $(CFLAGS) -o $@ $<
+	$(Q)$(CC) -c $(CFLAGS) -o $@ $<
 
 $(BIN): $(OBJS)
 	@echo " LD $@"
-	@$(CC) $(OBJS) -o $@ $(LDFLAGS)
+	$(Q)$(CC) $(OBJS) -o $@ $(LDFLAGS)
 
 clean:
-	rm -f $(BIN) $(OBJS)
+	$(Q)rm -f $(BIN) $(OBJS)
 
 install: $(BIN)
-	install -D -m 755 $(BIN) $(DESTDIR)$(bindir)/$(BIN)
+	$(Q)install -D -m 755 $(BIN) $(DESTDIR)$(bindir)/$(BIN)
